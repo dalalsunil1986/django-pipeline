@@ -29,7 +29,6 @@ spec:
         # only consider pods with this annotation
         #- --annotations=chaos.alpha.kubernetes.io/enabled=true
         # exclude all pods in the kube-system namespace
-        - --namespaces=!kube-system
         - --namespaces=<YOUR-NAMESPACE-HERE>
         # don't kill anything on weekends
         - --excluded-weekdays=Sat,Sun
