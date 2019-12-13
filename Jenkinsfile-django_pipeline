@@ -32,13 +32,13 @@ containers: [containerTemplate(name: 'kubectl', image: 'smesch/kubectl', ttyEnab
         stage('Deploy build to Kubernetes') {
             container('kubectl') {
                 try{
-                    sh("kubectl get deployment/django-st -n <YOUR-NAMESPACE>")
+                    sh("kubectl get deployment/django -n <YOUR-NAMESPACE>")
                     if(true){
-                        sh ("kubectl set image deployment/django-st django-st=<YOUR-DOCKER-HUB-ID>/django:${env.BUILD_NUMBER} -n <YOUR-NAMESPACE>")
+                        sh ("kubectl set image deployment/django django=<YOUR-DOCKER-HUB-ID>/django:${env.BUILD_NUMBER} -n <YOUR-NAMESPACE>")
                     }
                 }
                 catch(e){
-                    sh("kubectl run django-st --image=<YOUR-DOCKER-HUB-ID>/django:latest --replicas=3 -n <YOUR-NAMESPACE>")
+                    sh("kubectl run django --image=<YOUR-DOCKER-HUB-ID>/django:latest --replicas=3 -n <YOUR-NAMESPACE>")
                     echo "deploying"
                 }
                 sh ("kubectl get pods -n <YOUR-NAMESPACE>")
