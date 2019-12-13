@@ -1,0 +1,48 @@
+def label = "mypod-${UUID.randomUUID().toString()}"
+def serviceaccount = "jenkins-admin"
+podTemplate(label: label, serviceAccount: serviceaccount,
+containers: [containerTemplate(name: 'kubectl', image: 'smesch/kubectl', ttyEnabled: true, command: 'cat',
+                             volumes: [secretVolume(secretName: 'kube-config', mountPath: '/root/.kube')]),
+    containerTemplate(name: 'docker', image: 'docker:19.03', ttyEnabled: true, command: 'cat')],
+                             volumes: [hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock')]
+) {
+
+    node(label) {
+        def GIT_URL= 'https://github.com/khozema-nullwala/django-pipeline.git'
+		def GIT_BRANCH='master'
+
+        stage('Git Checkout'){
+			git branch: GIT_BRANCH, url: GIT_URL
+        }
+
+        stage('Docker Build') {
+			container('docker'){
+			   sh("docker build -t <YOUR-DOCKER-HUB-ID>/django:${env.BUILD_NUMBER} --network=host . && docker image tag <YOUR-DOCKER-HUB-ID>/django:${env.BUILD_NUMBER} <YOUR-DOCKER-HUB-ID>/django:latest")
+			}
+		}
+
+        stage('Push Container Image') {
+			container('docker'){
+				withDockerRegistry([ credentialsId: "<YOUR-DOCKER-CREDENTIALS>", url: "" ]) {
+				   sh("docker push <YOUR-DOCKER-HUB-ID>/django:${env.BUILD_NUMBER} && docker push <YOUR-DOCKER-HUB-ID>/django:latest")
+				}
+			}
+		}
+		
+        stage('Deploy build to Kubernetes') {
+            container('kubectl') {
+                try{
+                    sh("kubectl get deployment/django-st -n <YOUR-NAMESPACE>")
+                    if(true){
+                        sh ("kubectl set image deployment/django-st django-st=<YOUR-DOCKER-HUB-ID>/django:${env.BUILD_NUMBER} -n <YOUR-NAMESPACE>")
+                    }
+                }
+                catch(e){
+                    sh("kubectl run django-st --image=<YOUR-DOCKER-HUB-ID>/django:latest --replicas=3 -n <YOUR-NAMESPACE>")
+                    echo "deploying"
+                }
+                sh ("kubectl get pods -n <YOUR-NAMESPACE>")
+            }
+        }
+	}
+ }
