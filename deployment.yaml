@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: django
+  labels:
+    run: django
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      run: django
+  template:
+    metadata:
+      labels:
+        run: django
+        env: test
+    spec:
+      containers:
+      - name: django
+        image: nexgtech/django
+        ports:
+        - containerPort: 8000
