@@ -25,7 +25,7 @@ spec:
         # kill a pod every 1 minute
         - --interval=1m # Change the interval here
         # only target pods having label as django environment
-        - --labels=run=django
+        - --labels=app=django
         # only consider pods with this annotation
         #- --annotations=chaos.alpha.kubernetes.io/enabled=true
         # exclude all pods in the kube-system namespace
