@@ -3,20 +3,23 @@ kind: Deployment
 metadata:
   name: django
   labels:
-    run: django
+    app: django
 spec:
   replicas: 3
   selector:
     matchLabels:
-      run: django
+      app: django
   template:
     metadata:
       labels:
-        run: django
+        app: django
         env: test
     spec:
       containers:
       - name: django
-        image: nexgtech/django
+        imagePullPolicy: Always
+        image: localhost:32121/###USER###/django-pipeline/django:###TAG###
         ports:
         - containerPort: 8000
+      imagePullSecrets: 
+      - name: gitcred
