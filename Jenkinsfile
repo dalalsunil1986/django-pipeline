@@ -32,7 +32,7 @@ containers: [containerTemplate(name: 'kubectl', image: 'smesch/kubectl', ttyEnab
 
         stage('Push Container Image') {
             container('docker'){
-                withDockerRegistry([ credentialsId: "gitlab-user", url: "http://localhost:32121" ]) {
+              withDockerRegistry([ credentialsId: "gitlab-${TRAINING_USER}", url: "http://localhost:32121" ]) {
                    sh ("docker push localhost:32121/${TRAINING_USER}/django-pipeline/django:${env.BUILD_NUMBER}")
                    sh ("echo ${env.BUILD_NUMBER}")
                 }
