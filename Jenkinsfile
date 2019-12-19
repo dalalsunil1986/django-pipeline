@@ -44,14 +44,13 @@ containers: [containerTemplate(name: 'kubectl', image: 'smesch/kubectl', ttyEnab
                 try{
                     sh ("kubectl create ns $TRAINING_USER")
                     sh ("kubectl get secret gitcred --namespace=ethan --export -o yaml | kubectl apply --namespace=$TRAINING_USER -f -")
-                    //sh ("sed -i 's/${image}/localhost:32121/puneeth/django-pipeline/django:${env.BUILD_NUMBER}/g' deployment.yaml")
                     sh ("kubectl get deployment/django -n ${TRAINING_USER}")
                     if(true){
                         sh ("kubectl set image deployment/django localhost:32121/${TRAINING_USER}/django-pipeline/django:${env.BUILD_NUMBER} -n ${TRAINING_USER}")
                     }
                 }
                 catch(e){
-                
+                    sh ("kubectl get secret gitcred --namespace=ethan --export -o yaml | kubectl apply --namespace=$TRAINING_USER -f -")
                     sh ("sed -i 's/###USER###/${TRAINING_USER}/g' deployment.yaml")
                     sh ("sed -i 's/###TAG###/${env.BUILD_NUMBER}/g' deployment.yaml")
                     sh ("kubectl apply -f deployment.yaml -n ${TRAINING_USER} ")
