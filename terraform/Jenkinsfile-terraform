@@ -23,7 +23,7 @@ node(label) {
                     echo "$TERRAFORM_USER"
                     echo "$TERRAFORM_PASSWORD"
                    // sh("terraform apply -var access_key=${TERRAFORM_USER} -var secret_key=${TERRAFORM_PASSWORD} --auto-approve ")
-					sh("terraform apply -var access_key=${TERRAFORM_USER} -var secret_key=${TERRAFORM_PASSWORD} -var ami=${ami} -var ssh_key=${ssh_key} --auto-approve")
+					sh("terraform apply -var access_key=${TERRAFORM_USER} -var secret_key=${TERRAFORM_PASSWORD} --auto-approve")
                 }
             }
         }
