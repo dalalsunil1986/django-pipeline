@@ -1,0 +1,31 @@
+def label = "mypod-${UUID.randomUUID().toString()}"
+def serviceaccount = "jenkins-admin"
+podTemplate(label: label, serviceAccount: serviceaccount,
+containers: [containerTemplate(name: 'terraform', image: 'hashicorp/terraform', ttyEnabled: true, command: 'cat')],
+) {
+node(label) {
+    def GIT_URL= 'https://github.com/chandu412/Openshift-Terraform.git'
+    def GIT_BRANCH='master'
+    def TERRAFORM_CREDS = 'terraform-auth'
+	def ami = 'ami'
+	def ssh_key = 'ssh_key'
+    stage('Git Checkout'){
+        git branch: GIT_BRANCH, url: GIT_URL
+    }
+    stage('terraformexec') {
+            container('terraform') {
+                withCredentials([[$class: 'UsernamePasswordMultiBinding',
+                    credentialsId: 'terraform-auth',
+                    usernameVariable: 'TERRAFORM_USER',
+                    passwordVariable: 'TERRAFORM_PASSWORD']])
+					{
+                    sh("terraform init")
+                    echo "$TERRAFORM_USER"
+                    echo "$TERRAFORM_PASSWORD"
+                   // sh("terraform apply -var access_key=${TERRAFORM_USER} -var secret_key=${TERRAFORM_PASSWORD} --auto-approve ")
+					sh("terraform apply -var access_key=${TERRAFORM_USER} -var secret_key=${TERRAFORM_PASSWORD} --auto-approve")
+                }
+            }
+        }
+    }
+}
